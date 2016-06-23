@@ -13,6 +13,7 @@ var layer,
 
 var sprite;
 var cursors;
+var wasd;
 // set Game function prototype
 BasicGame.Game.prototype = {
 
@@ -58,7 +59,7 @@ BasicGame.Game.prototype = {
       this.load.tilemap('map', 'asset/tilemaps/tilemap.json', null, Phaser.Tilemap.TILED_JSON);
 
       this.load.image('tileset', 'asset/tilemaps/tileset.png',32,32);
-      this.load.image('phaser', 'asset/sprites/arrow.png');
+      this.load.spritesheet('phaser', 'asset/sprites/hero.png',32,48);
       this.load.spritesheet('coin', 'asset/sprites/coin.png', 32, 32);
     },
 
@@ -73,7 +74,7 @@ BasicGame.Game.prototype = {
 
         map.setCollision(1);
         map.setCollision(785);
-        console.log(map)
+
         //  This will set Tile ID 26 (the coin) to call the hitCoin function when collided with
         //map.setTileIndexCallback(785, this.hitCoin, this);
 
@@ -88,9 +89,15 @@ BasicGame.Game.prototype = {
 
         this.physics.p2.convertTilemap(map, collision_layer);
 
-        sprite = this.add.sprite(260, 100, 'phaser');
-        sprite.anchor.set(0.5);
+        sprite = this.add.sprite(32, 48, 'phaser',1);
+        //sprite.anchor.set(0.5);
         this.physics.p2.enable(sprite);
+        console.log(sprite)
+        //[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
+        sprite.animations.add('left', [4,5,6,7], 5, true);
+        sprite.animations.add('right', [8,9,10,11], 5, true);
+        sprite.animations.add('up', [12,13,14,15], 5, true);
+        sprite.animations.add('down', [0,1,2,3], 5, true);
 
         //sprite.body.setSize(32, 32, 8, 8);
 
@@ -102,8 +109,14 @@ BasicGame.Game.prototype = {
         sprite.body.collideWorldBounds = true
         this.camera.follow(sprite);
 
-        cursors = this.input.keyboard.createCursorKeys();
+        cursors =this.input.keyboard.createCursorKeys();
 
+        wasd = {
+          up:this.input.keyboard.addKey(Phaser.Keyboard.W),
+          down: this.input.keyboard.addKey(Phaser.Keyboard.S),
+          left: this.input.keyboard.addKey(Phaser.Keyboard.A),
+          right: this.input.keyboard.addKey(Phaser.Keyboard.D),
+        };
     },
     hitCoin: function (sprite, tile) {
       console.log('coin')
@@ -122,22 +135,28 @@ BasicGame.Game.prototype = {
         sprite.body.velocity.y = 0;
         sprite.body.angularVelocity = 0;
 
-        if (cursors.left.isDown)
+    if (cursors.left.isDown || wasd.left.isDown)
     {
-    	sprite.body.moveLeft(400);
+    	 sprite.body.moveLeft(150);
+       sprite.play('left');
     }
-    else if (cursors.right.isDown)
+    else if (cursors.right.isDown || wasd.right.isDown)
     {
-    	sprite.body.moveRight(400);
+    	sprite.body.moveRight(150);
+      sprite.play('right');
     }
 
-    if (cursors.up.isDown)
+    if (cursors.up.isDown || wasd.up.isDown)
     {
-    	sprite.body.moveUp(400);
+    	sprite.body.moveUp(150);
+      sprite.play('up');
     }
-    else if (cursors.down.isDown)
+    else if (cursors.down.isDown || wasd.down.isDown)
     {
-    	sprite.body.moveDown(400);
+    	sprite.body.moveDown(150);
+      sprite.play('down');
+    }else{
+
     }
 
     },
